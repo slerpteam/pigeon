@@ -96,7 +96,7 @@ defmodule Pigeon.FCM.Notification do
       target: target,
       notification: notification,
       data: data,
-      android: %{priority: 10}
+      android: %{priority: "high"}
     }
   end
 end
@@ -111,6 +111,7 @@ defimpl Pigeon.Encodable, for: Pigeon.FCM.Notification do
     message =
       %{}
       |> encode_target(notif.target)
+      |> maybe_encode_attr("priority", 10)
       |> maybe_encode_attr("android", notif.android)
       |> maybe_encode_attr("apns", notif.apns)
       |> maybe_encode_attr("data", notif.data)
