@@ -110,6 +110,7 @@ defimpl Pigeon.Encodable, for: Pigeon.FCM.Notification do
     message =
       %{}
       |> encode_target(notif.target)
+      |> maybe_encode_attr("priority", 10)
       |> maybe_encode_attr("android", notif.android)
       |> maybe_encode_attr("apns", notif.apns)
       |> maybe_encode_attr("data", notif.data)
@@ -128,7 +129,23 @@ defimpl Pigeon.Encodable, for: Pigeon.FCM.Notification do
 
   defp maybe_encode_attr(map, _key, nil), do: map
 
+  defp maybe_encode_attr(map, "android" = key, val) do
+    value = stringify(val)
+
+    Map.put(map, key, value)
+  end
+
   defp maybe_encode_attr(map, key, val) do
     Map.put(map, key, val)
+  end
+
+  defp stringify(map) do
+    Map.new(map, fn {k, v} ->
+      if is_map(v) do
+        {to_string(k), stringify(v)}
+      else
+        {to_string(k), to_string(v)}
+      end
+    end)
   end
 end
